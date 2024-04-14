@@ -1,37 +1,36 @@
 package frames;
 
+import jdk.jfr.Event;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
 
-public class MainFrame {
+public class MainFrame extends Event {
 
-    private List<String> livros = new ArrayList<>();
+    JButton btnLivros = new JButton("Adicionar Livros");
+    JFrame frame;
 
     public MainFrame() {
         criarTela();
     }
 
     private void criarTela() {
-        JFrame frame = new JFrame("Cadastro de Livros e Usuários");
+        this.frame = new JFrame("Cadastro de Livros e Usuários");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BorderLayout());
 
-        JButton btnLivros = new JButton("Adicionar Livros");
         btnLivros.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String livro = JOptionPane.showInputDialog(frame, "Digite o título do livro:");
-                if (livro != null && !livro.isEmpty()) {
-                    livros.add(livro);
-                    atualizarListagem();
-                }
+                JOptionPane.showMessageDialog(frame, "classes.Livro adicionado!");
             }
         });
 
@@ -54,6 +53,14 @@ public class MainFrame {
         frame.add(headerPanel, BorderLayout.NORTH);
         frame.add(livrosPanel, BorderLayout.CENTER);
         frame.setVisible(true);
+    }
+
+    public JButton getAddBookButton(){
+        return this.btnLivros;
+    }
+
+    public JFrame getFrame(){
+        return this.frame;
     }
 
     private void atualizarListagem() {
