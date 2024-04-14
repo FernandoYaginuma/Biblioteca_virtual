@@ -27,19 +27,27 @@ public class AddBookFrame {
         JLabel lblAuthor = new JLabel("Autor:");
         JTextField txtAuthor = new JTextField();
 
+        JLabel lblCategory = new JLabel("Categoria:");
+        JTextField txtCategory = new JTextField();
+
+        JLabel lblISBN = new JLabel("ISBN:");
+        JTextField txtISBN = new JTextField();
+
         JButton btnSave = new JButton("Salvar");
 
         btnSave.addActionListener((e -> {
             String title = txtTitle.getText();
             String author = txtAuthor.getText();
             String imageUrl = txtImageUrl.getText();
+            String category = txtCategory.getText();
+            String ISBN = txtISBN.getText();
 
             if(title.isEmpty() || author.isEmpty() || imageUrl.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Preencha todos os campos");
                 return;
             }
 
-            Book book = new Book(title, imageUrl, author);
+            Book book = new Book(title, imageUrl, author, category, ISBN);
 
             main.addBook(book);
             txtTitle.setText("");
