@@ -6,6 +6,7 @@ import interfaces.AddBookListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
@@ -18,6 +19,7 @@ public class AddBookFrame {
     }
 
     private void triggerAddBookEvent(Livro livro) {
+
         AddBookEvent evento = new AddBookEvent(this, livro);
         for (AddBookListener listener : listeners) {
             listener.addBook(evento);
@@ -28,7 +30,7 @@ public class AddBookFrame {
         listeners.add(listener);
     }
 
-    private static void createAndShowGUI() {
+    private void createAndShowGUI() {
         JFrame frame = new JFrame("Adicionar classes.Livro");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 300);
@@ -46,15 +48,22 @@ public class AddBookFrame {
         JTextField txtAuthor = new JTextField();
 
         JButton btnSave = new JButton("Salvar");
-        btnSave.addActionListener(e -> {
-            String imageUrl = txtImageUrl.getText();
+
+        btnSave.addActionListener((e -> {
             String title = txtTitle.getText();
             String author = txtAuthor.getText();
-            Livro livro = new Livro(imageUrl, title, author);
+            String imageUrl = txtImageUrl.getText();
 
-            void triggerAddBookEvent(livro);
+            if(title.isEmpty() || author.isEmpty() || imageUrl.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Preencha todos os campos");
+                return;
+            }
 
-        });
+            Livro livro = new Livro(title, imageUrl, author);
+
+            this.triggerAddBookEvent(livro);
+            frame.dispose();
+        }));
 
         panel.add(lblImageUrl);
         panel.add(txtImageUrl);
@@ -62,7 +71,7 @@ public class AddBookFrame {
         panel.add(txtTitle);
         panel.add(lblAuthor);
         panel.add(txtAuthor);
-        panel.add(new JLabel()); // Espaço vazio para alinhar o botão
+        panel.add(new JLabel());
         panel.add(btnSave);
 
         frame.add(panel);

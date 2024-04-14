@@ -41,5 +41,6 @@ public class Main implements AddBookListener {
     @Override
     public void addBook(AddBookEvent event) {
         Livro book = event.getLivro();
+        System.out.println("Livro: " + book.getTitle());
     }
 }
