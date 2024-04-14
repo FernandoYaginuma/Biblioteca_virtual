@@ -31,19 +31,31 @@ public class DashboardFrame extends Event {
             main.openAddBookFrame();
         });
 
-        JButton btnUsuarios = new JButton("Adicionar Usuários");
-        btnUsuarios.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "Usuário adicionado!");
-            }
-        });
-
         headerPanel.add(btnLivros, BorderLayout.WEST);
-        headerPanel.add(btnUsuarios, BorderLayout.EAST);
 
         JPanel livrosPanel = new JPanel();
-        livrosPanel.setLayout(new BoxLayout(livrosPanel, BoxLayout.Y_AXIS));
+        livrosPanel.setLayout(new BoxLayout(livrosPanel, BoxLayout.X_AXIS));
+
+        for (Book book : books ) {
+            System.out.println(book.getTitle());
+
+            JPanel livroPanel = new JPanel();
+            livroPanel.setLayout(new BoxLayout(livroPanel, BoxLayout.Y_AXIS));
+
+            JLabel titleLabel = new JLabel("Título: " + book.getTitle());
+            livroPanel.add(titleLabel);
+
+            JLabel authorLabel = new JLabel("Autor: " + book.getAuthor());
+            livroPanel.add(authorLabel);
+
+            JButton removeButton = new JButton("Remover");
+            removeButton.addActionListener(e -> {
+                main.removeBook(book);
+            });
+            livroPanel.add(removeButton);
+
+            livrosPanel.add(livroPanel);
+        }
 
         frame.add(headerPanel, BorderLayout.NORTH);
         frame.add(livrosPanel, BorderLayout.CENTER);
@@ -54,19 +66,4 @@ public class DashboardFrame extends Event {
         frame.setVisible(status);
     }
 
-    public void updateBooks(ArrayList<Book> newbooks) {
-        
-        for (Book book : newbooks ) {
-            System.out.println(book.getTitle());
-
-            JLabel label = new JLabel(book.getTitle());
-            frame.add(label);
-        }
-
-        this.books = newbooks;
-    }
-
-    public ArrayList<Book> getBooks() {
-        return books;
-    }
 }
