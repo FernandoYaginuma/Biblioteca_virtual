@@ -23,6 +23,7 @@ public class Main {
     public void addBook(Book book) {
         books.add(book);
         System.out.println("Livro adicionado: " + book.getTitle());
+        dashboardFrame.updateBooks(this.books);
     }
 
     public ArrayList<Book> getBooks() {

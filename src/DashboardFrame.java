@@ -39,28 +39,14 @@ public class DashboardFrame extends Event {
             }
         });
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-
-        for (Book book : books ) {
-            JLabel label = new JLabel(book.getTitle());
-            panel.add(label);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(panel);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
         headerPanel.add(btnLivros, BorderLayout.WEST);
         headerPanel.add(btnUsuarios, BorderLayout.EAST);
 
         JPanel livrosPanel = new JPanel();
         livrosPanel.setLayout(new BoxLayout(livrosPanel, BoxLayout.Y_AXIS));
 
-        updateBooks();
-
         frame.add(headerPanel, BorderLayout.NORTH);
         frame.add(livrosPanel, BorderLayout.CENTER);
-        frame.add(scrollPane);
     }
 
     public void show(Boolean status){
@@ -68,8 +54,16 @@ public class DashboardFrame extends Event {
         frame.setVisible(status);
     }
 
-    private void updateBooks() {
-        this.books = main.getBooks();
+    public void updateBooks(ArrayList<Book> newbooks) {
+        
+        for (Book book : newbooks ) {
+            System.out.println(book.getTitle());
+
+            JLabel label = new JLabel(book.getTitle());
+            frame.add(label);
+        }
+
+        this.books = newbooks;
     }
 
     public ArrayList<Book> getBooks() {
