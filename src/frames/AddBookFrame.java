@@ -1,13 +1,11 @@
 package frames;
 
-import classes.Livro;
+import classes.Book;
 import events.AddBookEvent;
 import interfaces.AddBookListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class AddBookFrame {
@@ -18,9 +16,9 @@ public class AddBookFrame {
         createAndShowGUI();
     }
 
-    private void triggerAddBookEvent(Livro livro) {
+    private void triggerAddBookEvent(Book book) {
 
-        AddBookEvent evento = new AddBookEvent(this, livro);
+        AddBookEvent evento = new AddBookEvent(this, book);
         for (AddBookListener listener : listeners) {
             listener.addBook(evento);
         }
@@ -59,9 +57,9 @@ public class AddBookFrame {
                 return;
             }
 
-            Livro livro = new Livro(title, imageUrl, author);
+            Book book = new Book(title, imageUrl, author);
 
-            this.triggerAddBookEvent(livro);
+            this.triggerAddBookEvent(book);
             frame.dispose();
         }));
 

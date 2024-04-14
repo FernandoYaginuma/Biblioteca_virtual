@@ -1,11 +1,11 @@
 package classes;
 
-public class Livro {
+public class Book {
     private final String imageUrl;
     private final String title;
     private final String author;
 
-    public Livro( String title, String imageUrl, String author) {
+    public Book(String title, String imageUrl, String author) {
         this.imageUrl = imageUrl;
         this.title = title;
         this.author = author;

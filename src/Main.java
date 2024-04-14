@@ -1,4 +1,4 @@
-import classes.Livro;
+import classes.Book;
 import classes.Usuario;
 import events.AddBookEvent;
 import frames.AddBookFrame;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main implements AddBookListener {
-    public List<Livro> livros = new ArrayList<>();
+    public List<Book> books = new ArrayList<>();
     public List<Usuario> usuarios = new ArrayList<>();
     private MainFrame mainFrame;
     private AddBookFrame addBookFrame;
@@ -40,7 +40,8 @@ public class Main implements AddBookListener {
 
     @Override
     public void addBook(AddBookEvent event) {
-        Livro book = event.getLivro();
-        System.out.println("Livro: " + book.getTitle());
+        Book book = event.getBook();
+        books.add(book);
+        System.out.println("Livro adicionado: " + book.getTitle());
     }
 }

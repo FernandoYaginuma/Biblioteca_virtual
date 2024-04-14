@@ -1,17 +1,17 @@
 package events;
 
 import java.util.EventObject;
-import classes.Livro;
+import classes.Book;
 
 public class AddBookEvent extends EventObject {
-    private Livro livro;
+    private Book book;
 
-    public AddBookEvent(Object source, Livro livro) {
+    public AddBookEvent(Object source, Book book) {
         super(source);
-        this.livro = livro;
+        this.book = book;
     }
 
-    public Livro getLivro() {
-        return livro;
+    public Book getBook() {
+        return book;
     }
 }
