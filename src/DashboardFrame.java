@@ -1,6 +1,7 @@
 import jdk.jfr.Event;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,18 +43,25 @@ public class DashboardFrame extends Event {
             JPanel livroPanel = new JPanel();
             livroPanel.setLayout(new BoxLayout(livroPanel, BoxLayout.Y_AXIS));
 
-            JLabel titleLabel = new JLabel("Título: " + book.getTitle());
+            JLabel titleLabel = new JLabel("Título:");
             livroPanel.add(titleLabel);
 
-            JLabel authorLabel = new JLabel("Autor: " + book.getAuthor());
+            JLabel titleTxt = new JLabel(book.getTitle());
+            livroPanel.add(titleTxt);
+
+            JLabel authorLabel = new JLabel("Autor:");
+            authorLabel.setBorder(new EmptyBorder(8,0,0,0));
             livroPanel.add(authorLabel);
+
+            JLabel authortxt = new JLabel(book.getAuthor());
+            livroPanel.add(authortxt);
 
             JButton removeButton = new JButton("Remover");
             removeButton.addActionListener(e -> {
                 main.removeBook(book);
             });
             livroPanel.add(removeButton);
-
+            livroPanel.setBorder(new EmptyBorder(16, 16, 16, 16));
             livrosPanel.add(livroPanel);
         }
 
