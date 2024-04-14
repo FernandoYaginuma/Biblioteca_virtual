@@ -20,4 +20,8 @@ public class Book {
     public String getAuthor(){
         return this.author;
     }
+
+    public void updateStatus(Boolean status){
+        this.status = status;
+    }
 }
