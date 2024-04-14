@@ -1,5 +1,3 @@
-package frames;
-
 import jdk.jfr.Event;
 
 import javax.swing.*;
@@ -7,15 +5,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.EventObject;
-import java.util.List;
 
-public class MainFrame extends Event {
+public class DashboardFrame extends Event {
+    private Main main;
+    private ArrayList<Book> books;
 
     JButton btnLivros = new JButton("Adicionar Livros");
     JFrame frame;
 
-    public MainFrame() {
+    public DashboardFrame(Main main) {
+        this.main = main;
+        this.books = this.main.getBooks();
         criarTela();
     }
 
@@ -27,11 +27,8 @@ public class MainFrame extends Event {
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BorderLayout());
 
-        btnLivros.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame, "classes.Livro adicionado!");
-            }
+        btnLivros.addActionListener((e) -> {
+            main.openAddBookFrame();
         });
 
         JButton btnUsuarios = new JButton("Adicionar Usuários");
@@ -42,27 +39,40 @@ public class MainFrame extends Event {
             }
         });
 
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+        for (Book book : books ) {
+            JLabel label = new JLabel(book.getTitle());
+            panel.add(label);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
         headerPanel.add(btnLivros, BorderLayout.WEST);
         headerPanel.add(btnUsuarios, BorderLayout.EAST);
 
         JPanel livrosPanel = new JPanel();
         livrosPanel.setLayout(new BoxLayout(livrosPanel, BoxLayout.Y_AXIS));
 
-        atualizarListagem();
+        updateBooks();
 
         frame.add(headerPanel, BorderLayout.NORTH);
         frame.add(livrosPanel, BorderLayout.CENTER);
-        frame.setVisible(true);
+        frame.add(scrollPane);
     }
 
-    public JButton getAddBookButton(){
-        return this.btnLivros;
+    public void show(Boolean status){
+
+        frame.setVisible(status);
     }
 
-    public JFrame getFrame(){
-        return this.frame;
+    private void updateBooks() {
+        this.books = main.getBooks();
     }
 
-    private void atualizarListagem() {
+    public ArrayList<Book> getBooks() {
+        return books;
     }
 }

@@ -1,35 +1,17 @@
-package frames;
-
-import classes.Book;
-import events.AddBookEvent;
-import interfaces.AddBookListener;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class AddBookFrame {
+    private Main main;
+    private JFrame frame;
 
-    private ArrayList<AddBookListener> listeners = new ArrayList<>();
-
-    public AddBookFrame() {
+    public AddBookFrame(Main main) {
+        this.main = main;
         createAndShowGUI();
     }
 
-    private void triggerAddBookEvent(Book book) {
-
-        AddBookEvent evento = new AddBookEvent(this, book);
-        for (AddBookListener listener : listeners) {
-            listener.addBook(evento);
-        }
-    }
-
-    public void addBookListener(AddBookListener listener) {
-        listeners.add(listener);
-    }
-
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Adicionar classes.Livro");
+        frame = new JFrame("Adicionar classes.Livro");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 300);
 
@@ -59,7 +41,10 @@ public class AddBookFrame {
 
             Book book = new Book(title, imageUrl, author);
 
-            this.triggerAddBookEvent(book);
+            main.addBook(book);
+            txtTitle.setText("");
+            txtAuthor.setText("");
+            txtImageUrl.setText("");
             frame.dispose();
         }));
 
@@ -73,7 +58,10 @@ public class AddBookFrame {
         panel.add(btnSave);
 
         frame.add(panel);
-        frame.setVisible(true);
+    }
+
+    public void show(Boolean status){
+        this.frame.setVisible(status);
     }
 
 }

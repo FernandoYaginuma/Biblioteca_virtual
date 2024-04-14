@@ -1,5 +1,3 @@
-package classes;
-
 public class Book {
     private final String imageUrl;
     private final String title;
