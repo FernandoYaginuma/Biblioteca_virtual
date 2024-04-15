@@ -1,4 +1,3 @@
-// Fernando Yudi Yaginuma - 837755    Igor Bianchini Ulian - 837782     Pedro Augusto de Oliveira Cardoso - 837652
 
 import java.util.ArrayList;
 import java.util.List;
