@@ -9,7 +9,7 @@ public class Book {
         this.category = category;
         this.title = title;
         this.author = author;
-        ISBN = isbn;
+        this.ISBN = isbn;
     }
 
 
