@@ -62,8 +62,9 @@ public class BookControllerImpl implements BookController {
     }
 
     @Override
-    public void setDone(int bookId) {
-        bookDatabase.markBookAsDone(bookId);
+    public void setRented(int bookId, boolean rented) {
+
+        bookDatabase.updateBookRented(bookId, rented);
     }
 
     @Override

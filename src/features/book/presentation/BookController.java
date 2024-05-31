@@ -9,6 +9,6 @@ public interface BookController {
     void setView(BookView view);
     void addBook(BookDTO bookDTO);
     void updateBook(int bookId, BookDTO bookDTO);
-    void setDone(int bookId);
+    void setRented(int bookId, boolean rented);
     List<Book> getBooks();
 }

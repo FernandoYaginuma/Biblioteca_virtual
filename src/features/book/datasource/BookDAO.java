@@ -77,11 +77,11 @@ public class BookDAO implements BookDatabase, BookSubscriber {
     }
 
     @Override
-    public void markBookAsDone(int bookId) {
+    public void updateBookRented(int bookId, boolean rented) {
         try {
             DatabaseManager.getDatabaseSessionFactory().inTransaction(session -> {
                 var book = session.get(Book.class, bookId);
-                book.setRented(true);
+                book.setRented(rented);
                 session.persist(book);
             });
             System.out.println("features.book.model.Book edited successfully.");

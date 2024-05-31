@@ -7,6 +7,7 @@ import features.book.model.Book;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,13 +36,16 @@ public class BookViewImpl extends JFrame implements BookView, BookListener {
         setLayout(new BorderLayout());
 
         // Table to display books
-        table = new DefaultTableModel(new Object[]{"ID", "Nome", "Autor", "Categoria", "Status", "ISBN", "Ação"}, 0);
+        table = new NonEditableTableModel(new Object[]{"ID", "Nome", "Autor", "Categoria", "Status", "ISBN", "Ação"}, 0);
         JTable bookTable = new JTable(table);
         JScrollPane scrollPane = new JScrollPane(bookTable);
         add(scrollPane, BorderLayout.CENTER);
 
+        TableColumn actionColumn = bookTable.getColumnModel().getColumn(6);
+        actionColumn.setCellRenderer(new TableButtonEdit(this));
+
         // Button to add a new book
-        JButton addButton = new JButton("Add Book");
+        JButton addButton = new JButton("Adicionar livro");
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -50,30 +54,18 @@ public class BookViewImpl extends JFrame implements BookView, BookListener {
         });
         add(addButton, BorderLayout.NORTH);
 
-        // Button to edit a book
-        JButton editButton = new JButton("Edit Book");
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = bookTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    editBook(selectedRow);
-                } else {
-                    JOptionPane.showMessageDialog(BookViewImpl.this, "Please select a book to edit.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        add(editButton, BorderLayout.SOUTH);
-
         // Button to mark book as done
-        JButton doneButton = new JButton("Mark as Done");
+        JButton doneButton = new JButton("Alterar status");
         doneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = bookTable.getSelectedRow();
                 if (selectedRow != -1) {
                     int bookId = (int) table.getValueAt(selectedRow, 0);
-                    bookController.setDone(bookId);
+                    String rentedString = (String) table.getValueAt(selectedRow, 4);
+                    boolean isRented = rentedString == "Alugado";
+
+                    bookController.setRented(bookId, !isRented);
                 } else {
                     JOptionPane.showMessageDialog(BookViewImpl.this, "Please select a book to mark as done.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -89,7 +81,8 @@ public class BookViewImpl extends JFrame implements BookView, BookListener {
         // Populate the table with books from the database
         List<Book> books = bookController.getBooks();
         for (Book book : books) {
-            table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), book.isRented(), book.getISBN(), "" });
+            String rentedString = book.isRented() ? "Alugado" : "Disponível";
+            table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
         }
     }
 
@@ -132,7 +125,7 @@ public class BookViewImpl extends JFrame implements BookView, BookListener {
         }
     }
 
-    private void editBook(int rowIndex) {
+    public void editBook(int rowIndex) {
         int bookId = (int) table.getValueAt(rowIndex, 0);
         String currentName = (String) table.getValueAt(rowIndex, 1);
         String currentAuthor = (String) table.getValueAt(rowIndex, 2);

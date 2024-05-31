@@ -9,5 +9,5 @@ public interface BookDatabase {
     void insertBook(BookDTO bookDTO);
     void updateBook(int bookId, BookDTO bookDTO);
     List<Book> getBooks();
-    void markBookAsDone(int bookId);
+    void updateBookRented(int bookId, boolean rented);
 }
