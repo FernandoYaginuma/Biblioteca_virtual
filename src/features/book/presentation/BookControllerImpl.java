@@ -7,7 +7,7 @@ import features.book.model.Book;
 import java.util.List;
 
 public class BookControllerImpl implements BookController {
-    private BookView bookView;
+    private BooksInterface bookView;
     private final BookDatabase bookDatabase;
 
     public BookControllerImpl(BookDatabase bookDatabase) {
@@ -15,7 +15,7 @@ public class BookControllerImpl implements BookController {
     }
 
     @Override
-    public void setView(BookView view) {
+    public void setView(BooksInterface view) {
         this.bookView = view;
     }
 

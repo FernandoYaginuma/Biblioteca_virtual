@@ -1,5 +1,6 @@
 package features.book.presentation;
 
+import custom.ui.ButtonEditor;
 import features.book.datasource.BookListener;
 import features.book.datasource.BookSubscriber;
 import features.book.dto.BookDTO;
@@ -13,11 +14,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class BookViewImpl extends JFrame implements BookView, BookListener {
+public class BooksScreen extends JFrame implements BooksInterface, BookListener {
     private DefaultTableModel table;
     private final BookController bookController;
 
-    public BookViewImpl(BookSubscriber bookSubscriber, BookController bookController) {
+    public BooksScreen(BookSubscriber bookSubscriber, BookController bookController) {
         setTitle("Biblioteca virtual");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -42,7 +43,12 @@ public class BookViewImpl extends JFrame implements BookView, BookListener {
         add(scrollPane, BorderLayout.CENTER);
 
         TableColumn actionColumn = bookTable.getColumnModel().getColumn(6);
+
         actionColumn.setCellRenderer(new TableButtonEdit(this));
+        actionColumn.setCellEditor(new ButtonEditor(new JCheckBox()));
+//
+//        actionColumn.setCellRenderer(new TableButtonEdit(this));
+//        actionColumn.setCellEditor(new ButtonEditor(new JCheckBox()));
 
         // Button to add a new book
         JButton addButton = new JButton("Adicionar livro");
@@ -67,7 +73,7 @@ public class BookViewImpl extends JFrame implements BookView, BookListener {
 
                     bookController.setRented(bookId, !isRented);
                 } else {
-                    JOptionPane.showMessageDialog(BookViewImpl.this, "Please select a book to mark as done.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(BooksScreen.this, "Please select a book to mark as done.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -181,7 +187,7 @@ public class BookViewImpl extends JFrame implements BookView, BookListener {
 
     @Override
     public void showErrorMessage(String msg) {
-        JOptionPane.showMessageDialog(BookViewImpl.this, msg, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(BooksScreen.this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     @Override

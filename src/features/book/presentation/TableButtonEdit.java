@@ -5,9 +5,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 
 class TableButtonEdit extends DefaultTableCellRenderer {
-    private final BookViewImpl view;
+    private final BooksScreen view;
 
-    public TableButtonEdit(BookViewImpl view) {
+    public TableButtonEdit(BooksScreen view) {
+        super();
         this.view = view;
         setHorizontalAlignment(SwingConstants.CENTER);
     }

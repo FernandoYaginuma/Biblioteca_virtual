@@ -1,12 +1,15 @@
 package di;
 
+import auth.presentation.LoginController;
+import auth.presentation.LoginInterface;
+import auth.presentation.LoginScreen;
 import features.book.datasource.BookDAO;
 import features.book.datasource.BookDatabase;
 import features.book.datasource.BookSubscriber;
 import features.book.presentation.BookController;
 import features.book.presentation.BookControllerImpl;
-import features.book.presentation.BookView;
-import features.book.presentation.BookViewImpl;
+import features.book.presentation.BooksInterface;
+import features.book.presentation.BooksScreen;
 
 public class ServiceLocator {
 
@@ -43,7 +46,11 @@ public class ServiceLocator {
         return new BookControllerImpl(getBookDatabase());
     }
 
-    public BookView getBookView() {
-        return new BookViewImpl(getBookSubscriber(), getBookController());
+    public BooksInterface getBookView() {
+        return new BooksScreen(getBookSubscriber(), getBookController());
+    }
+
+    public LoginInterface getLoginView(){
+        return new LoginScreen();
     }
 }
