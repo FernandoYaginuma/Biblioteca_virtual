@@ -11,7 +11,12 @@ import features.book.presentation.BooksInterface;
 import features.book.presentation.BooksScreen;
 import features.dashboard.DashboardInterface;
 import features.dashboard.DashboardScreen;
+import features.user.datasource.UserDAO;
+import features.user.datasource.UserDatabase;
+import features.user.datasource.UserSubscriber;
+import features.user.presentation.UserControllerInterface;
 import features.user.presentation.UserInterface;
+import features.user.presentation.UserController;
 import features.user.presentation.UserScreen;
 
 public class ServiceLocator {
@@ -28,6 +33,7 @@ public class ServiceLocator {
     }
 
     private BookDAO bookDAO;
+    private UserDAO userDAO;
 
     private BookDAO getBookDao() {
         if(bookDAO == null) {
@@ -35,6 +41,14 @@ public class ServiceLocator {
         }
 
         return bookDAO;
+    }
+
+    private UserDAO getUserDao() {
+        if(userDAO == null) {
+            userDAO = new UserDAO();
+        }
+
+        return userDAO;
     }
 
     public BookDatabase getBookDatabase() {
@@ -58,8 +72,19 @@ public class ServiceLocator {
     }
 
 
+    public UserDatabase getUserDatabase() {
+        return getUserDao();
+    }
+
+    public UserSubscriber getUserSubscriber() {
+        return getUserDao();
+    }
+
+    public UserControllerInterface getUserController() {
+        return new UserController(getUserDatabase());
+    }
     public UserInterface getUserView(){
-        return new UserScreen();
+        return new UserScreen(getUserSubscriber(), getUserController());
     }
 
     public DashboardInterface getDashboardView(){

@@ -38,10 +38,27 @@ public class UserDAO implements UserDatabase, UserSubscriber {
                 var book = new User(userDTO);
                 session.persist(book);
             });
-            System.out.println("features.book.model.Book inserted successfully.");
             notifyDataChanged();
         } catch (Exception e) {
-            System.out.println("Error inserting book: " + e.getMessage());
+            System.out.println("Error inserting user: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateUser(int userId, UserDTO userDTO) {
+        try {
+            DatabaseManager.getDatabaseSessionFactory().inTransaction(session -> {
+//                var user = session.get(Book.class, userId);
+//                user.setName(bookDTO.name);
+//                user.setAuthor(bookDTO.author);
+//                user.setCategory(bookDTO.category);
+//                user.setISBN(bookDTO.ISBN);
+//                session.persist(book);
+            });
+            System.out.println("features.book.model.Book edited successfully.");
+            notifyDataChanged();
+        } catch (Exception e) {
+            System.out.println("Error editing book: " + e.getMessage());
         }
     }
 

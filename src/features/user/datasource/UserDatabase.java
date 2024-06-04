@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface UserDatabase {
     void addUser(UserDTO userDTO);
+    void updateUser(int userId, UserDTO userDTO);
     List<User> getUsers();
 }

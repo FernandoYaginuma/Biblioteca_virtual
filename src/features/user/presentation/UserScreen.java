@@ -2,28 +2,34 @@ package features.user.presentation;
 import custom.NonEditableTableModel;
 import di.ServiceLocator;
 import features.book.dto.BookDTO;
+import features.user.datasource.UserListener;
+import features.user.datasource.UserSubscriber;
+import features.user.dto.UserDTO;
+import features.user.model.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.table.*;
 
-public class UserScreen extends JFrame implements ActionListener, UserInterface {
+public class UserScreen extends JFrame implements ActionListener, UserInterface, UserListener {
     private DefaultTableModel table;
-    private UserController userController;
+    private UserControllerInterface userControllerInterface;
 
     private Boolean isAdmin = false;
 
-    public UserScreen() {
-        this.userController = new UserController(this);
+    public UserScreen(UserSubscriber userSubscriber, UserControllerInterface userControllerInterface) {
+        this.userControllerInterface = userControllerInterface;
         setLocationRelativeTo(null);
         setTitle("Gerenciar usuários");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        userSubscriber.subscribe(this);
+
         initializeUI();
 
-        loadBooks();
+        loadUsers();
     }
 
     private void goBack(){
@@ -92,15 +98,15 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface 
         });
     }
 
-    private void loadBooks() {
+    private void loadUsers() {
         // Clear existing rows from the table
         table.setRowCount(0);
 
-        // Populate the table with books from the database
-//        List<Book> books = bookController.getBooks();
-//        for (Book book : books) {
-//            String rentedString = book.isRented() ? "Alugado" : "Disponível";
-//            table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
+//        List<User> users = userControllerInterface.getUsers();
+//
+//        for (User user : users) {
+//            String rentedString = user.isRented() ? "Alugado" : "Disponível";
+//            table.addRow(new Object[]{user.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
 //        }
     }
 
@@ -126,7 +132,13 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface 
         int result = JOptionPane.showConfirmDialog(this, panel, "Adicionar usuário", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String name = nameField.getText();
-            userController.addUser(name);
+            String email = emailLabel.getText();
+            String password = passLabel.getText();
+            Boolean admin = false;
+
+            UserDTO userDTO = new UserDTO(name, email, password, admin);
+
+            userControllerInterface.addUser(userDTO);
         }
     }
 
@@ -143,10 +155,26 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface 
         panel.add(nameLabel);
         panel.add(nameField);
 
+        JLabel emailLabel = new JLabel("Email:");
+        JTextField emailField= new JTextField();
+        panel.add(emailLabel);
+        panel.add(emailField);
+
+        JLabel passLabel = new JLabel("Senha:");
+        JTextField passField = new JTextField();
+        panel.add(passLabel);
+        panel.add(passField);
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Editar Usuário", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String name = nameField.getText();
-            userController.updateUser(userId, name);
+            String email = emailLabel.getText();
+            String password = passLabel.getText();
+            Boolean admin = false;
+
+            UserDTO userDTO = new UserDTO(name, email, password, admin);
+
+            userControllerInterface.updateUser(userId, userDTO);
         }
     }
 
@@ -158,5 +186,10 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface 
     @Override
     public void actionPerformed(ActionEvent e) {
 
+    }
+
+    @Override
+    public void updateData() {
+        loadUsers();
     }
 }
