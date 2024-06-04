@@ -1,115 +1,153 @@
 package features.user.presentation;
+import custom.NonEditableTableModel;
+import di.ServiceLocator;
+import features.book.dto.BookDTO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.table.*;
 
-import java.util.ArrayList;
-import java.util.List;
 public class UserScreen extends JFrame implements ActionListener, UserInterface {
+    private DefaultTableModel table;
+    private UserController userController;
 
-    // Components of the screen
-    private JTable userTable;
-    private JButton btnNewUser;
-    private JButton btnEditUser;
-    private JButton btnDeleteUser;
-
-    // List to store users
-    private List<User> users = new ArrayList<>();
+    private Boolean isAdmin = false;
 
     public UserScreen() {
-        // Configure the frame
-        setTitle("User Management");
+        this.userController = new UserController(this);
+        setLocationRelativeTo(null);
+        setTitle("Gerenciar usuários");
+        setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
+
+        initializeUI();
+
+        loadBooks();
+    }
+
+    private void goBack(){
+        setVisible(false);
+        SwingUtilities.invokeLater(() -> {
+            ServiceLocator.getInstance().getDashboardView().open(this.isAdmin);
+        });
+    }
+
+
+    private void initializeUI() {
         setLayout(new BorderLayout());
 
-        // Create the user table
-        createUserTable();
-
-        // Create and add buttons
-        JPanel buttonPanel = new JPanel();
-        btnNewUser = new JButton("New User");
-        btnNewUser.addActionListener(this);
-        buttonPanel.add(btnNewUser);
-
-        btnEditUser = new JButton("Edit User");
-        btnEditUser.addActionListener(this);
-        btnEditUser.setEnabled(false); // Disable initially
-        buttonPanel.add(btnEditUser);
-
-        btnDeleteUser = new JButton("Delete User");
-        btnDeleteUser.addActionListener(this);
-        btnDeleteUser.setEnabled(false); // Disable initially
-        buttonPanel.add(btnDeleteUser);
-
-        add(buttonPanel, BorderLayout.SOUTH);
-    }
-
-    private void createUserTable() {
-        // Create a data model for the table
-        DefaultTableModel model = new DefaultTableModel(new Object[]{"Name", "Cargo"}, 0);
-
-        // Populate the table with user data
-        for (User user : users) {
-//            model.addRow(new Object[]{user.getName(), user.getEmail(), user.getPhone()});
-        }
-
-        // Create and add the table to the main panel
-        userTable = new JTable(model);
-        userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane scrollPane = new JScrollPane(userTable);
+        table = new NonEditableTableModel(new Object[]{"ID", "Nome", "Email", "Cargo"}, 0);
+        JTable bookTable = new JTable(table);
+        JScrollPane scrollPane = new JScrollPane(bookTable);
         add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
+
+        JButton backButton = new JButton("< Voltar");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UserScreen.this.goBack();
+            }
+        });
+        buttonPanel.add(backButton);
+
+        JTextField searchField = new JTextField();
+        Dimension size = new Dimension(452, 30);
+        searchField.setPreferredSize(size);
+        buttonPanel.add(searchField);
+
+        JButton editButton = new JButton("Editar usuário");
+        editButton.setEnabled(false);
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = bookTable.getSelectedRow();
+
+                if(selectedRow == -1){
+                    JOptionPane.showMessageDialog(UserScreen.this, "Selecione um livro para editar.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                editUser(selectedRow);
+            }
+        });
+        buttonPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
+
+        JButton addButton = new JButton("Adicionar usuário");
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addUser();
+            }
+        });
+        buttonPanel.add(addButton, BorderLayout.EAST);
+
+        add(buttonPanel, BorderLayout.NORTH);
+
+        bookTable.getSelectionModel().addListSelectionListener(event -> {
+            editButton.setEnabled(isAdmin && bookTable.getSelectedRow() != -1);
+        });
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
+    private void loadBooks() {
+        // Clear existing rows from the table
+        table.setRowCount(0);
 
-        if (source == btnNewUser) {
-            // Open screen to create a new user
-            // ...
-        } else if (source == btnEditUser) {
-            // Get the selected user and open the edit screen
-            // ...
-        } else if (source == btnDeleteUser) {
-            // Delete the selected user and update the table
-            // ...
+        // Populate the table with books from the database
+//        List<Book> books = bookController.getBooks();
+//        for (Book book : books) {
+//            String rentedString = book.isRented() ? "Alugado" : "Disponível";
+//            table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
+//        }
+    }
+
+    private void addUser() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(8, 2));
+
+        JLabel nameLabel = new JLabel("Nome:");
+        JTextField nameField = new JTextField();
+        panel.add(nameLabel);
+        panel.add(nameField);
+
+        JLabel emailLabel = new JLabel("Email:");
+        JTextField emailField= new JTextField();
+        panel.add(emailLabel);
+        panel.add(emailField);
+
+        JLabel passLabel = new JLabel("Senha:");
+        JTextField passField = new JTextField();
+        panel.add(passLabel);
+        panel.add(passField);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "Adicionar usuário", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String name = nameField.getText();
+            userController.addUser(name);
         }
     }
 
-    // Methods to manage users (add, edit, delete)
+    public void editUser(int rowIndex) {
+        int userId = (int) table.getValueAt(rowIndex, 0);
+        String currentName = (String) table.getValueAt(rowIndex, 1);
 
-    public void addUser(User user) {
-        users.add(user);
-        // Update table
-        updateTable();
-    }
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 2));
 
-    public void editUser(User user) {
-        // Update the user in the list
-        // Update table
-        updateTable();
-    }
+        JLabel nameLabel = new JLabel("Nome:");
+        JTextField nameField = new JTextField();
+        nameField.setText(currentName);
+        panel.add(nameLabel);
+        panel.add(nameField);
 
-    public void deleteUser(User user) {
-        users.remove(user);
-        // Update table
-        updateTable();
-    }
-
-    private void updateTable() {
-        // Clear the table
-        DefaultTableModel model = (DefaultTableModel) userTable.getModel();
-        model.setRowCount(0);
-
-        // Populate the table with user data
-        for (User user : users) {
-//            model.addRow(new Object[]{user.getName(), user.getEmail(), user.getPhone()});
+        int result = JOptionPane.showConfirmDialog(this, panel, "Editar Usuário", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String name = nameField.getText();
+            userController.updateUser(userId, name);
         }
-
-        // Refresh the table
-        userTable.repaint();
     }
 
     @Override
@@ -117,13 +155,8 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface 
         setVisible(true);
     }
 
-    // Class to represent a user
-    private class User {
-        private String name;
-        private String email;
-        private String phone;
+    @Override
+    public void actionPerformed(ActionEvent e) {
 
-        // Getters and setters
-        // ...
     }
 }

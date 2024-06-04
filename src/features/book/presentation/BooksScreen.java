@@ -1,6 +1,7 @@
 package features.book.presentation;
 
-import custom.ui.ButtonEditor;
+import custom.NonEditableTableModel;
+import di.ServiceLocator;
 import features.book.datasource.BookListener;
 import features.book.datasource.BookSubscriber;
 import features.book.dto.BookDTO;
@@ -8,7 +9,6 @@ import features.book.model.Book;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,18 +16,19 @@ import java.util.List;
 
 public class BooksScreen extends JFrame implements BooksInterface, BookListener {
     private DefaultTableModel table;
-    private final BookController bookController;
+    private final BookControllerInterface bookControllerInterface;
 
     private Boolean isAdmin = false;
 
-    public BooksScreen(BookSubscriber bookSubscriber, BookController bookController) {
+    public BooksScreen(BookSubscriber bookSubscriber, BookControllerInterface bookControllerInterface) {
+        setLocationRelativeTo(null);
         setTitle("Biblioteca virtual");
-        setSize(690, 400);
+        setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         bookSubscriber.subscribe(this);
-        this.bookController = bookController;
-        bookController.setView(this);
+        this.bookControllerInterface = bookControllerInterface;
+        bookControllerInterface.setView(this);
 
         initializeUI();
 
@@ -35,26 +36,39 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         loadBooks();
     }
 
+    private void goBack(){
+        setVisible(false);
+        SwingUtilities.invokeLater(() -> {
+            ServiceLocator.getInstance().getDashboardView().open(this.isAdmin);
+        });
+    }
+
+
     private void initializeUI() {
         setLayout(new BorderLayout());
+        // Painel superior com botão Voltar
+
 
         // Table to display books
-        table = new NonEditableTableModel(new Object[]{"ID", "Nome", "Autor", "Categoria", "Status", "ISBN", "Ação"}, 0);
+        table = new NonEditableTableModel(new Object[]{"ID", "Nome", "Autor", "Categoria", "Status", "ISBN"}, 0);
         JTable bookTable = new JTable(table);
         JScrollPane scrollPane = new JScrollPane(bookTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        TableColumn actionColumn = bookTable.getColumnModel().getColumn(6);
-
-        actionColumn.setCellRenderer(new TableButtonEdit(this));
-        actionColumn.setCellEditor(new ButtonEditor(new JCheckBox()));
-
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0)); // Set leading alignment and no gaps
 
+        JButton backButton = new JButton("< Voltar");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BooksScreen.this.goBack();
+            }
+        });
+        buttonPanel.add(backButton);
 
         JTextField searchField = new JTextField();
-        Dimension size = new Dimension(350, 30); // Largura = 200, Altura = 30
+        Dimension size = new Dimension(380, 30); // Largura = 200, Altura = 30
         searchField.setPreferredSize(size);
         buttonPanel.add(searchField);
 
@@ -72,7 +86,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
                 String rentedString = (String) table.getValueAt(selectedRow, 4);
                 boolean isRented = rentedString == "Alugado";
 
-                bookController.setRented(bookId, !isRented);
+                bookControllerInterface.setRented(bookId, !isRented);
 
 
                 JOptionPane.showMessageDialog(BooksScreen.this, "Status do livro alterado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -119,7 +133,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         table.setRowCount(0);
 
         // Populate the table with books from the database
-        List<Book> books = bookController.getBooks();
+        List<Book> books = bookControllerInterface.getBooks();
         for (Book book : books) {
             String rentedString = book.isRented() ? "Alugado" : "Disponível";
             table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
@@ -161,7 +175,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
 
             BookDTO bookDTO = new BookDTO(name, author, category, isbn);
 
-            bookController.addBook(bookDTO);
+            bookControllerInterface.addBook(bookDTO);
         }
     }
 
@@ -210,7 +224,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
 
             BookDTO bookDTO = new BookDTO(name, author, category, isbn);
 
-            bookController.updateBook(bookId, bookDTO);
+            bookControllerInterface.updateBook(bookId, bookDTO);
         }
     }
 

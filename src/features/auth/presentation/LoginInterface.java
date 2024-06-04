@@ -1,4 +1,4 @@
-package auth.presentation;
+package features.auth.presentation;
 
 public interface LoginInterface {
     void open();

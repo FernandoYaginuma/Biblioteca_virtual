@@ -1,4 +1,4 @@
-package auth.presentation;
+package features.auth.presentation;
 
 public interface LoginControllerInterface {
     Boolean login(String email, String password);

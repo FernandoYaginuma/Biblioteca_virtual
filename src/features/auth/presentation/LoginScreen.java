@@ -1,4 +1,4 @@
-package auth.presentation;
+package features.auth.presentation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +15,7 @@ public class LoginScreen extends JFrame implements ActionListener, LoginInterfac
     private LoginController loginController = new LoginController(this);
 
     public LoginScreen() {
+        setLocationRelativeTo(null);
         setTitle("Tela de Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 200);

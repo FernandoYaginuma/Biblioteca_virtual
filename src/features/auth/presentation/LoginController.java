@@ -1,4 +1,4 @@
-package auth.presentation;
+package features.auth.presentation;
 
 import di.ServiceLocator;
 
@@ -24,7 +24,7 @@ public class LoginController implements LoginControllerInterface {
         loginScreen.setVisible(false);
 
         SwingUtilities.invokeLater(() -> {
-            ServiceLocator.getInstance().getBookView().open(true);
+            ServiceLocator.getInstance().getDashboardView().open(true);
         });
 
         return true;
