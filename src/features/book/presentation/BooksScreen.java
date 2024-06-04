@@ -18,9 +18,11 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
     private DefaultTableModel table;
     private final BookController bookController;
 
+    private Boolean isAdmin = false;
+
     public BooksScreen(BookSubscriber bookSubscriber, BookController bookController) {
         setTitle("Biblioteca virtual");
-        setSize(600, 400);
+        setSize(690, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         bookSubscriber.subscribe(this);
@@ -46,11 +48,55 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
 
         actionColumn.setCellRenderer(new TableButtonEdit(this));
         actionColumn.setCellEditor(new ButtonEditor(new JCheckBox()));
-//
-//        actionColumn.setCellRenderer(new TableButtonEdit(this));
-//        actionColumn.setCellEditor(new ButtonEditor(new JCheckBox()));
 
-        // Button to add a new book
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0)); // Set leading alignment and no gaps
+
+
+        JTextField searchField = new JTextField();
+        Dimension size = new Dimension(350, 30); // Largura = 200, Altura = 30
+        searchField.setPreferredSize(size);
+        buttonPanel.add(searchField);
+
+        JButton doneButton = new JButton("Alterar status");
+        doneButton.setEnabled(false);
+        doneButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = bookTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(BooksScreen.this, "Selecione um livro para marcar como alugado.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                int bookId = (int) table.getValueAt(selectedRow, 0);
+                String rentedString = (String) table.getValueAt(selectedRow, 4);
+                boolean isRented = rentedString == "Alugado";
+
+                bookController.setRented(bookId, !isRented);
+
+
+                JOptionPane.showMessageDialog(BooksScreen.this, "Status do livro alterado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        buttonPanel.add(doneButton, BorderLayout.EAST);
+
+        JButton editButton = new JButton("Editar livro");
+        editButton.setEnabled(false);
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = bookTable.getSelectedRow();
+
+                if(selectedRow == -1){
+                    JOptionPane.showMessageDialog(BooksScreen.this, "Selecione um livro para editar.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                editBook(selectedRow);
+            }
+        });
+        buttonPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
+
         JButton addButton = new JButton("Adicionar livro");
         addButton.addActionListener(new ActionListener() {
             @Override
@@ -58,26 +104,14 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
                 addBook();
             }
         });
-        add(addButton, BorderLayout.NORTH);
+        buttonPanel.add(addButton, BorderLayout.EAST);
 
-        // Button to mark book as done
-        JButton doneButton = new JButton("Alterar status");
-        doneButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = bookTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    int bookId = (int) table.getValueAt(selectedRow, 0);
-                    String rentedString = (String) table.getValueAt(selectedRow, 4);
-                    boolean isRented = rentedString == "Alugado";
+        add(buttonPanel, BorderLayout.NORTH);
 
-                    bookController.setRented(bookId, !isRented);
-                } else {
-                    JOptionPane.showMessageDialog(BooksScreen.this, "Please select a book to mark as done.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+        bookTable.getSelectionModel().addListSelectionListener(event -> {
+            doneButton.setEnabled(bookTable.getSelectedRow() != -1);
+            editButton.setEnabled(isAdmin && bookTable.getSelectedRow() != -1);
         });
-        add(doneButton, BorderLayout.WEST);
     }
 
     private void loadBooks() {
@@ -181,7 +215,8 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
     }
 
     @Override
-    public void open() {
+    public void open(Boolean isAdmin) {
+        this.isAdmin = isAdmin;
         setVisible(true);
     }
 

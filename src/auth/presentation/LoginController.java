@@ -1,7 +1,16 @@
 package auth.presentation;
 
+import di.ServiceLocator;
+
+import javax.swing.*;
+
 public class LoginController implements LoginControllerInterface {
     private LoginInterface loginInterface;
+    private LoginScreen loginScreen;
+
+    public LoginController(LoginScreen loginScreen){
+        this.loginScreen = loginScreen;
+    }
 
     private void showErrorMessage(String msg) {
         if(loginInterface != null) {
@@ -10,7 +19,14 @@ public class LoginController implements LoginControllerInterface {
     }
 
     @Override
-    public void login(String email, String password) {
+    public Boolean login(String email, String password) {
 
+        loginScreen.setVisible(false);
+
+        SwingUtilities.invokeLater(() -> {
+            ServiceLocator.getInstance().getBookView().open(true);
+        });
+
+        return true;
     }
 }

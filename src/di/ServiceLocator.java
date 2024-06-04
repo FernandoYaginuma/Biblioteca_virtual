@@ -10,6 +10,8 @@ import features.book.presentation.BookController;
 import features.book.presentation.BookControllerImpl;
 import features.book.presentation.BooksInterface;
 import features.book.presentation.BooksScreen;
+import features.user.presentation.UserInterface;
+import features.user.presentation.UserScreen;
 
 public class ServiceLocator {
 
@@ -52,5 +54,9 @@ public class ServiceLocator {
 
     public LoginInterface getLoginView(){
         return new LoginScreen();
+    }
+
+    public UserInterface getUserView(){
+        return new UserScreen();
     }
 }

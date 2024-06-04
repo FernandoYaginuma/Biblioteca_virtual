@@ -12,7 +12,7 @@ public class LoginScreen extends JFrame implements ActionListener, LoginInterfac
     private JPasswordField campoSenha;
     private JButton botaoLogin;
 
-    private LoginController loginController = new LoginController();
+    private LoginController loginController = new LoginController(this);
 
     public LoginScreen() {
         setTitle("Tela de Login");
@@ -38,7 +38,6 @@ public class LoginScreen extends JFrame implements ActionListener, LoginInterfac
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Verificar se o login e senha estão corretos
         String email = campoUsuario.getText();
         String password = new String(campoSenha.getPassword());
 
