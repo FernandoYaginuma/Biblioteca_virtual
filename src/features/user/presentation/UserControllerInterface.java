@@ -10,5 +10,6 @@ public interface UserControllerInterface {
     void updateUser(int userId, UserDTO userDTO);
     void removeUser(int userId);
     boolean validateEmailUniqueness(String email);
+    User getUserByEmail(String email);
     List<User> getUsers();
 }

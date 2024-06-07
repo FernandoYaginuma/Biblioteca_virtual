@@ -1,5 +1,6 @@
 package di;
 
+import features.auth.presentation.LoginController;
 import features.auth.presentation.LoginInterface;
 import features.auth.presentation.LoginScreen;
 import features.book.datasource.BookDAO;
@@ -67,10 +68,14 @@ public class ServiceLocator {
         return new BooksScreen(getBookSubscriber(), getBookController());
     }
 
-    public LoginInterface getLoginView(){
-        return new LoginScreen();
+    public LoginController getloginController(){
+        return new LoginController(getUserController());
     }
 
+
+    public LoginInterface getLoginView(){
+        return new LoginScreen(getloginController());
+    }
 
     public UserDatabase getUserDatabase() {
         return getUserDao();

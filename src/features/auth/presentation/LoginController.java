@@ -1,32 +1,39 @@
 package features.auth.presentation;
 
 import di.ServiceLocator;
+import features.user.model.User;
+import features.user.presentation.UserControllerInterface;
 
 import javax.swing.*;
 
 public class LoginController implements LoginControllerInterface {
-    private LoginInterface loginInterface;
-    private LoginScreen loginScreen;
+    private UserControllerInterface userControllerInterface;
 
-    public LoginController(LoginScreen loginScreen){
-        this.loginScreen = loginScreen;
+    public LoginController(UserControllerInterface userControllerInterface){
+        this.userControllerInterface = userControllerInterface;
     }
 
-    private void showErrorMessage(String msg) {
-        if(loginInterface != null) {
-            loginInterface.showErrorMessage(msg);
-        }
-    }
 
     @Override
-    public Boolean login(String email, String password) {
+    public Boolean login(String email, String password, LoginScreen loginScreen) {
 
-        loginScreen.setVisible(false);
+        try {
+            User user = userControllerInterface.getUserByEmail(email);
 
-        SwingUtilities.invokeLater(() -> {
-            ServiceLocator.getInstance().getDashboardView().open(true);
-        });
+            if (user == null) {
+                return false;
+            }
 
-        return true;
+            if (!user.getPassword().equals(password)) {
+                return false;
+            }
+
+            loginScreen.setVisible(false);
+            SwingUtilities.invokeLater(() -> ServiceLocator.getInstance().getDashboardView().open(true));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

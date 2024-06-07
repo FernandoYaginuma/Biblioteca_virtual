@@ -11,10 +11,10 @@ public class LoginScreen extends JFrame implements ActionListener, LoginInterfac
     private JTextField campoUsuario;
     private JPasswordField campoSenha;
     private JButton botaoLogin;
+    private LoginControllerInterface loginControllerInterface;
 
-    private LoginController loginController = new LoginController(this);
-
-    public LoginScreen() {
+    public LoginScreen(LoginControllerInterface loginControllerInterface) {
+        this.loginControllerInterface = loginControllerInterface;
         setLocationRelativeTo(null);
         setTitle("Tela de Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -42,7 +42,10 @@ public class LoginScreen extends JFrame implements ActionListener, LoginInterfac
         String email = campoUsuario.getText();
         String password = new String(campoSenha.getPassword());
 
-        loginController.login(email, password);
+        Boolean success = loginControllerInterface.login(email, password, this);
+        if(!success){
+            this.showErrorMessage("Usuário ou senha inválidos");
+        }
     }
 
     @Override
