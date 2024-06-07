@@ -68,7 +68,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         buttonPanel.add(backButton);
 
         JTextField searchField = new JTextField();
-        Dimension size = new Dimension(380, 30); // Largura = 200, Altura = 30
+        Dimension size = new Dimension(280, 30); // Largura = 200, Altura = 30
         searchField.setPreferredSize(size);
         buttonPanel.add(searchField);
 
@@ -111,6 +111,23 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         });
         buttonPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
 
+        JButton removeButton = new JButton("Excluir livro");
+        removeButton.setEnabled(false);
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = bookTable.getSelectedRow();
+
+                if(selectedRow == -1){
+                    JOptionPane.showMessageDialog(BooksScreen.this, "Selecione um livro para excluir.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                removeBook(selectedRow);
+            }
+        });
+        buttonPanel.add(removeButton, BorderLayout.EAST); // Add to the rightmost edge
+
         JButton addButton = new JButton("Adicionar livro");
         addButton.addActionListener(new ActionListener() {
             @Override
@@ -125,6 +142,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         bookTable.getSelectionModel().addListSelectionListener(event -> {
             doneButton.setEnabled(bookTable.getSelectedRow() != -1);
             editButton.setEnabled(isAdmin && bookTable.getSelectedRow() != -1);
+            removeButton.setEnabled(isAdmin && bookTable.getSelectedRow() != -1);
         });
     }
 
@@ -178,6 +196,51 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
             bookControllerInterface.addBook(bookDTO);
         }
     }
+
+    public void removeBook(int rowIndex) {
+        int bookId = (int) table.getValueAt(rowIndex, 0);
+
+        // Criar JDialog de confirmação
+        JDialog confirmationDialog = new JDialog((JFrame) this, "Confirmar exclusão");
+        confirmationDialog.setLayout(new BoxLayout(confirmationDialog.getContentPane(), BoxLayout.Y_AXIS));
+
+        JLabel confirmationMessage = new JLabel("Tem certeza que deseja excluir este livro?");
+        confirmationDialog.add(confirmationMessage);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+
+        JButton yesButton = new JButton("Sim");
+        yesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                bookControllerInterface.removeBook(bookId);
+
+                // Fechar JDialog
+                confirmationDialog.dispose();
+            }
+        });
+        buttonPanel.add(yesButton);
+
+        JButton noButton = new JButton("Não");
+        noButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Fechar JDialog sem excluir
+                confirmationDialog.dispose();
+            }
+        });
+        buttonPanel.add(noButton);
+
+        confirmationDialog.add(Box.createVerticalGlue());
+        confirmationDialog.add(buttonPanel);
+
+        // Exibir JDialog
+        confirmationDialog.pack();
+        confirmationDialog.setLocationRelativeTo(this);
+        confirmationDialog.setVisible(true);
+    }
+
 
     public void editBook(int rowIndex) {
         int bookId = (int) table.getValueAt(rowIndex, 0);

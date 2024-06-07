@@ -62,6 +62,24 @@ public class BookDAO implements BookDatabase, BookSubscriber {
     }
 
     @Override
+    public void removeBook(int bookId) {
+        try {
+            DatabaseManager.getDatabaseSessionFactory().inTransaction(session -> {
+                Book book = session.get(Book.class, bookId);
+                if (book != null) {
+                    session.delete(book);
+                    System.out.println("features.book.model.Book deleted successfully.");
+                } else {
+                    System.out.println("Book with ID " + bookId + " not found.");
+                }
+            });
+            notifyDataChanged();
+        } catch (Exception e) {
+            System.out.println("Error deleting book: " + e.getMessage());
+        }
+    }
+
+    @Override
     public List<Book> getBooks() {
         List<Book> result = new ArrayList<>();
         try {

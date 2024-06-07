@@ -35,10 +35,11 @@ public class UserDAO implements UserDatabase, UserSubscriber {
     public void addUser(UserDTO userDTO) {
         try {
             DatabaseManager.getDatabaseSessionFactory().inTransaction(session -> {
-                var book = new User(userDTO);
-                session.persist(book);
+                var user = new User(userDTO);
+                session.persist(user);
             });
             notifyDataChanged();
+            System.out.println("User added");
         } catch (Exception e) {
             System.out.println("Error inserting user: " + e.getMessage());
         }
@@ -58,7 +59,7 @@ public class UserDAO implements UserDatabase, UserSubscriber {
             System.out.println("features.book.model.Book edited successfully.");
             notifyDataChanged();
         } catch (Exception e) {
-            System.out.println("Error editing book: " + e.getMessage());
+            System.out.println("Error editing user: " + e.getMessage());
         }
     }
 
@@ -67,8 +68,7 @@ public class UserDAO implements UserDatabase, UserSubscriber {
         List<User> result = new ArrayList<>();
         try {
             result = DatabaseManager.getDatabaseSessionFactory().fromTransaction(session -> {
-                return session.createSelectionQuery("from Users", User.class)
-                        .getResultList();
+                return session.createSelectionQuery("from User", User.class).getResultList();
             });
         } catch (Exception e) {
             e.printStackTrace();

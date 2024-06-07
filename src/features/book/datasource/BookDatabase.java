@@ -8,6 +8,8 @@ import java.util.List;
 public interface BookDatabase {
     void insertBook(BookDTO bookDTO);
     void updateBook(int bookId, BookDTO bookDTO);
+
+    void removeBook(int bookId);
     List<Book> getBooks();
     void updateBookRented(int bookId, boolean rented);
 }

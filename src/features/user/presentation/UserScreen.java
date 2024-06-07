@@ -10,6 +10,7 @@ import features.user.model.User;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import javax.swing.table.*;
 
 public class UserScreen extends JFrame implements ActionListener, UserInterface, UserListener {
@@ -44,8 +45,8 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         setLayout(new BorderLayout());
 
         table = new NonEditableTableModel(new Object[]{"ID", "Nome", "Email", "Cargo"}, 0);
-        JTable bookTable = new JTable(table);
-        JScrollPane scrollPane = new JScrollPane(bookTable);
+        JTable userTable = new JTable(table);
+        JScrollPane scrollPane = new JScrollPane(userTable);
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
@@ -70,7 +71,7 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = bookTable.getSelectedRow();
+                int selectedRow = userTable.getSelectedRow();
 
                 if(selectedRow == -1){
                     JOptionPane.showMessageDialog(UserScreen.this, "Selecione um livro para editar.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -93,21 +94,20 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
 
         add(buttonPanel, BorderLayout.NORTH);
 
-        bookTable.getSelectionModel().addListSelectionListener(event -> {
-            editButton.setEnabled(isAdmin && bookTable.getSelectedRow() != -1);
+        userTable.getSelectionModel().addListSelectionListener(event -> {
+            editButton.setEnabled(isAdmin && userTable.getSelectedRow() != -1);
         });
     }
 
     private void loadUsers() {
-        // Clear existing rows from the table
         table.setRowCount(0);
 
-//        List<User> users = userControllerInterface.getUsers();
-//
-//        for (User user : users) {
-//            String rentedString = user.isRented() ? "Alugado" : "Disponível";
-//            table.addRow(new Object[]{user.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
-//        }
+        List<User> users = userControllerInterface.getUsers();
+
+        for (User user : users) {
+            String role = user.isAdmin() ? "Administrador" : "Usuário";
+            table.addRow(new Object[]{user.getId(), user.getName(), user.getEmail(), role});
+        }
     }
 
     private void addUser() {

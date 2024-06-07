@@ -62,6 +62,11 @@ public class BookController implements BookControllerInterface {
     }
 
     @Override
+    public void removeBook(int bookId) {
+        bookDatabase.removeBook(bookId);
+    }
+
+    @Override
     public void setRented(int bookId, boolean rented) {
 
         bookDatabase.updateBookRented(bookId, rented);
