@@ -1,7 +1,5 @@
 package features.user.datasource;
 
-import features.book.dto.BookDTO;
-import features.book.model.Book;
 import features.user.dto.UserDTO;
 import features.user.model.User;
 import infrastructure.DatabaseManager;
@@ -21,8 +19,8 @@ public class UserDAO implements UserDatabase, UserSubscriber {
     }
 
     @Override
-    public void subscribe(UserListener bookListener) {
-        listeners.add(bookListener);
+    public void subscribe(UserListener userListener) {
+        listeners.add(userListener);
     }
 
     private void notifyDataChanged() {

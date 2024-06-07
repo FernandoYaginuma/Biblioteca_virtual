@@ -1,6 +1,7 @@
 package infrastructure;
 
 import features.book.model.Book;
+import features.user.model.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -25,6 +26,7 @@ public class DatabaseManager {
         try {
             sessionFactory = new MetadataSources(registry)
                     .addAnnotatedClass(Book.class)
+                    .addAnnotatedClass(User.class)   // Add User class
                     .buildMetadata()
                     .buildSessionFactory();
 
