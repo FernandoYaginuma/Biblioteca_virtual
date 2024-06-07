@@ -10,5 +10,7 @@ import java.util.List;
 public interface UserDatabase {
     void addUser(UserDTO userDTO);
     void updateUser(int userId, UserDTO userDTO);
+    void removeUser(int userId);
+    boolean validateEmailUniqueness(String email);
     List<User> getUsers();
 }

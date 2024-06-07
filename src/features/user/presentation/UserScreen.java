@@ -154,6 +154,14 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
             String password = passField.getText();
             Boolean admin = false;
 
+
+            Boolean isEmailUnique = userControllerInterface.validateEmailUniqueness(email);
+
+            if(!isEmailUnique){
+                JOptionPane.showMessageDialog(this, "Já existe um usuário com esse email", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             UserDTO userDTO = new UserDTO(name, email, password, admin);
 
             userControllerInterface.addUser(userDTO);
@@ -176,8 +184,7 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         yesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                userControllerInterface.deleteUser(bookId);
-
+                userControllerInterface.removeUser(userId);
                 // Fechar JDialog
                 confirmationDialog.dispose();
             }
