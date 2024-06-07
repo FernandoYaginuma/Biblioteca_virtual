@@ -35,8 +35,16 @@ public class User {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getId() {
@@ -45,5 +53,13 @@ public class User {
 
     public boolean isAdmin(){
         return this.admin;
+    }
+
+    public void setIsAdmin(Boolean admin){
+        this.admin = admin;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

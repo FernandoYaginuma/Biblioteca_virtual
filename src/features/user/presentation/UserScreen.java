@@ -1,7 +1,6 @@
 package features.user.presentation;
 import custom.NonEditableTableModel;
 import di.ServiceLocator;
-import features.book.dto.BookDTO;
 import features.user.datasource.UserListener;
 import features.user.datasource.UserSubscriber;
 import features.user.dto.UserDTO;
@@ -17,7 +16,6 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
     private DefaultTableModel table;
     private UserControllerInterface userControllerInterface;
 
-    private Boolean isAdmin = false;
 
     public UserScreen(UserSubscriber userSubscriber, UserControllerInterface userControllerInterface) {
         this.userControllerInterface = userControllerInterface;
@@ -36,7 +34,7 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
     private void goBack(){
         setVisible(false);
         SwingUtilities.invokeLater(() -> {
-            ServiceLocator.getInstance().getDashboardView().open(this.isAdmin);
+            ServiceLocator.getInstance().getDashboardView().open(true);
         });
     }
 
@@ -62,7 +60,7 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         buttonPanel.add(backButton);
 
         JTextField searchField = new JTextField();
-        Dimension size = new Dimension(452, 30);
+        Dimension size = new Dimension(300, 30);
         searchField.setPreferredSize(size);
         buttonPanel.add(searchField);
 
@@ -74,14 +72,29 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
                 int selectedRow = userTable.getSelectedRow();
 
                 if(selectedRow == -1){
-                    JOptionPane.showMessageDialog(UserScreen.this, "Selecione um livro para editar.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(UserScreen.this, "Selecione um usuário para editar.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 editUser(selectedRow);
             }
         });
-        buttonPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
+
+        JButton deleteButton = new JButton("Excluir usuário");
+        deleteButton.setEnabled(false);
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = userTable.getSelectedRow();
+
+                if(selectedRow == -1){
+                    JOptionPane.showMessageDialog(UserScreen.this, "Selecione um usuário para excluir.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                deleteUser(selectedRow);
+            }
+        });
 
         JButton addButton = new JButton("Adicionar usuário");
         addButton.addActionListener(new ActionListener() {
@@ -90,12 +103,17 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
                 addUser();
             }
         });
+
+        buttonPanel.add(editButton, BorderLayout.EAST);
+        buttonPanel.add(deleteButton, BorderLayout.EAST);
+
         buttonPanel.add(addButton, BorderLayout.EAST);
 
         add(buttonPanel, BorderLayout.NORTH);
 
         userTable.getSelectionModel().addListSelectionListener(event -> {
-            editButton.setEnabled(isAdmin && userTable.getSelectedRow() != -1);
+            editButton.setEnabled(userTable.getSelectedRow() != -1);
+            deleteButton.setEnabled(userTable.getSelectedRow() != -1);
         });
     }
 
@@ -132,8 +150,8 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         int result = JOptionPane.showConfirmDialog(this, panel, "Adicionar usuário", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String name = nameField.getText();
-            String email = emailLabel.getText();
-            String password = passLabel.getText();
+            String email = emailField.getText();
+            String password = passField.getText();
             Boolean admin = false;
 
             UserDTO userDTO = new UserDTO(name, email, password, admin);
@@ -141,13 +159,58 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
             userControllerInterface.addUser(userDTO);
         }
     }
+    public void deleteUser(int rowIndex) {
+        int userId = (int) table.getValueAt(rowIndex, 0);
+
+        // Criar JDialog de confirmação
+        JDialog confirmationDialog = new JDialog((JFrame) this, "Confirmar exclusão");
+        confirmationDialog.setLayout(new BoxLayout(confirmationDialog.getContentPane(), BoxLayout.Y_AXIS));
+
+        JLabel confirmationMessage = new JLabel("Tem certeza que deseja excluir este usuário?");
+        confirmationDialog.add(confirmationMessage);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+
+        JButton yesButton = new JButton("Sim");
+        yesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                userControllerInterface.deleteUser(bookId);
+
+                // Fechar JDialog
+                confirmationDialog.dispose();
+            }
+        });
+        buttonPanel.add(yesButton);
+
+        JButton noButton = new JButton("Não");
+        noButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Fechar JDialog sem excluir
+                confirmationDialog.dispose();
+            }
+        });
+        buttonPanel.add(noButton);
+
+        confirmationDialog.add(Box.createVerticalGlue());
+        confirmationDialog.add(buttonPanel);
+
+        // Exibir JDialog
+        confirmationDialog.pack();
+        confirmationDialog.setLocationRelativeTo(this);
+        confirmationDialog.setVisible(true);
+    }
 
     public void editUser(int rowIndex) {
         int userId = (int) table.getValueAt(rowIndex, 0);
         String currentName = (String) table.getValueAt(rowIndex, 1);
+        String currentEmail = (String) table.getValueAt(rowIndex, 2);
+        Boolean currentIsAdmin = (String) table.getValueAt(rowIndex, 3) == "Administrador";
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2));
+        panel.setLayout(new GridLayout(5, 2)); // Add one more row for admin selection
 
         JLabel nameLabel = new JLabel("Nome:");
         JTextField nameField = new JTextField();
@@ -156,7 +219,8 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         panel.add(nameField);
 
         JLabel emailLabel = new JLabel("Email:");
-        JTextField emailField= new JTextField();
+        JTextField emailField = new JTextField();
+        emailField.setText(currentEmail);
         panel.add(emailLabel);
         panel.add(emailField);
 
@@ -165,12 +229,19 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         panel.add(passLabel);
         panel.add(passField);
 
+        // Add admin selection checkbox
+        JLabel adminLabel = new JLabel("Administrador:");
+        JCheckBox isAdminCheckbox = new JCheckBox();
+        isAdminCheckbox.setSelected(currentIsAdmin);  // Set checkbox based on current admin status
+        panel.add(adminLabel);
+        panel.add(isAdminCheckbox);
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Editar Usuário", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String name = nameField.getText();
-            String email = emailLabel.getText();
-            String password = passLabel.getText();
-            Boolean admin = false;
+            String email = emailField.getText();
+            String password = passField.getText();
+            Boolean admin = isAdminCheckbox.isSelected();
 
             UserDTO userDTO = new UserDTO(name, email, password, admin);
 
