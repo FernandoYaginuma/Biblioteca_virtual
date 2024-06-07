@@ -20,12 +20,12 @@ public class UserController implements  UserControllerInterface {
 
     @Override
     public void addUser(UserDTO userDTO) {
-
+        userDatabase.addUser(userDTO);
     }
 
     @Override
-    public void updateUser(int bookId, UserDTO userDTO) {
-
+    public void updateUser(int userId, UserDTO userDTO) {
+    userDatabase.updateUser(userId, userDTO);
     }
 
     @Override

@@ -22,6 +22,8 @@ public class User {
 
     private boolean admin;
 
+    public User() {}
+
     public User(UserDTO userDTO) {
         this.name = userDTO.name;
         this.email = userDTO.email;
