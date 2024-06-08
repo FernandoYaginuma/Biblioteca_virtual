@@ -16,6 +16,8 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
     private DefaultTableModel table;
     private UserControllerInterface userControllerInterface;
 
+    private int userId;
+
 
     public UserScreen(UserSubscriber userSubscriber, UserControllerInterface userControllerInterface) {
         this.userControllerInterface = userControllerInterface;
@@ -34,7 +36,7 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
     private void goBack(){
         setVisible(false);
         SwingUtilities.invokeLater(() -> {
-            ServiceLocator.getInstance().getDashboardView().open(true);
+            ServiceLocator.getInstance().getDashboardView().open(true, userId);
         });
     }
 
@@ -147,12 +149,18 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         panel.add(passLabel);
         panel.add(passField);
 
+        JLabel adminLabel = new JLabel("Administrador:");
+        JCheckBox isAdminCheckbox = new JCheckBox();
+        isAdminCheckbox.setSelected(false);  // Set checkbox based on current admin status
+        panel.add(adminLabel);
+        panel.add(isAdminCheckbox);
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Adicionar usuário", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             String name = nameField.getText();
             String email = emailField.getText();
             String password = passField.getText();
-            Boolean admin = false;
+            Boolean admin = isAdminCheckbox.isSelected();
 
 
             Boolean isEmailUnique = userControllerInterface.validateEmailUniqueness(email);
@@ -257,7 +265,8 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
     }
 
     @Override
-    public void open() {
+    public void open(int userId) {
+        this.userId = userId;
         setVisible(true);
     }
 

@@ -22,8 +22,10 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
     private JButton editButton;
     private JButton removeButton;
     private JButton addButton;
-
+    private JTextField searchField;
     private Boolean isAdmin = false;
+    private Boolean isJustUserBooks = false;
+    private int userId;
 
     public BooksScreen(BookSubscriber bookSubscriber, BookControllerInterface bookControllerInterface) {
         setLocationRelativeTo(null);
@@ -36,16 +38,27 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         bookControllerInterface.setView(this);
 
         initializeUI();
-
-        // Load books from the database and display them
-        loadBooks("");
     }
 
     private void goBack(){
         setVisible(false);
         SwingUtilities.invokeLater(() -> {
-            ServiceLocator.getInstance().getDashboardView().open(this.isAdmin);
+            ServiceLocator.getInstance().getDashboardView().open(this.isAdmin, userId);
         });
+    }
+
+    private int getDurationFromUser() {
+        int duration = 0;
+        String durationString = JOptionPane.showInputDialog(BooksScreen.this, "Informe a duração do aluguel (dias):");
+        if (durationString != null) {
+            try {
+                duration = Integer.parseInt(durationString);
+            } catch (NumberFormatException e) {
+                // Handle invalid input (not an integer)
+                JOptionPane.showMessageDialog(BooksScreen.this, "A duração deve ser um número inteiro.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return duration;
     }
 
 
@@ -55,13 +68,16 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
 
 
         // Table to display books
-        table = new NonEditableTableModel(new Object[]{"ID", "Nome", "Autor", "Categoria", "Status", "ISBN"}, 0);
+        table = new NonEditableTableModel(new Object[]{"ID", "Nome", "Autor", "Categoria", "Status", "Tempo", "ISBN"}, 0);
         JTable bookTable = new JTable(table);
         JScrollPane scrollPane = new JScrollPane(bookTable);
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0)); // Set leading alignment and no gaps
+
+        JPanel footerPanel = new JPanel();
+        footerPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0)); // Set leading alignment and no gaps
 
         JButton backButton = new JButton("< Voltar");
         backButton.addActionListener(new ActionListener() {
@@ -73,9 +89,11 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         buttonPanel.add(backButton);
 
         JTextField searchField = new JTextField();
-        Dimension size = new Dimension(isAdmin ? 680 : 280, 30); // Largura = 200, Altura = 30
+        Dimension size = new Dimension(630, 30);
         searchField.setPreferredSize(size);
         buttonPanel.add(searchField);
+
+        this.searchField = searchField;
 
         JButton doneButton = new JButton("Alterar status");
         doneButton.setEnabled(false);
@@ -91,10 +109,27 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
                 String rentedString = (String) table.getValueAt(selectedRow, 4);
                 boolean isRented = rentedString == "Alugado";
 
-                bookControllerInterface.setRented(bookId, !isRented);
+                if(isRented){
+                    bookControllerInterface.returnBook(bookId);
+                    updateData();
+                    return;
+                }
 
+                int duration = getDurationFromUser();
 
-                JOptionPane.showMessageDialog(BooksScreen.this, "Status do livro alterado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                if (duration > 0) {
+                    bookControllerInterface.rent(bookId, userId, duration);
+
+                    updateData();
+                    if(isAdmin){
+                        JOptionPane.showMessageDialog(BooksScreen.this, "Status do livro alterado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    }else{
+                        JOptionPane.showMessageDialog(BooksScreen.this, "Livro alugado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(BooksScreen.this, "Por favor, insira uma duração válida.", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+
             }
         });
 
@@ -148,10 +183,10 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         });
 
         buttonPanel.add(searchButton, BorderLayout.EAST);
-        buttonPanel.add(doneButton, BorderLayout.EAST);
-        buttonPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
-        buttonPanel.add(removeButton, BorderLayout.EAST); // Add to the rightmost edge
-        buttonPanel.add(addButton, BorderLayout.EAST);
+        footerPanel.add(doneButton, BorderLayout.EAST);
+        footerPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
+        footerPanel.add(removeButton, BorderLayout.EAST); // Add to the rightmost edge
+        footerPanel.add(addButton, BorderLayout.EAST);
 
         this.doneButton = doneButton;
         this.editButton = editButton;
@@ -159,6 +194,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         this.addButton = addButton;
 
         add(buttonPanel, BorderLayout.NORTH);
+        add(footerPanel, BorderLayout.SOUTH);
 
         bookTable.getSelectionModel().addListSelectionListener(event -> {
             doneButton.setEnabled(bookTable.getSelectedRow() != -1);
@@ -172,10 +208,12 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         table.setRowCount(0);
 
         // Populate the table with books from the database
-        List<Book> books = bookControllerInterface.getBooks(searchTerm);
+        List<Book> books = this.isJustUserBooks ? bookControllerInterface.getBooksFromUser(this.userId, searchTerm) : bookControllerInterface.getBooks(searchTerm);
         for (Book book : books) {
             String rentedString = book.isRented() ? "Alugado" : "Disponível";
-            table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
+            String rentDurationString = book.getRentDuration() + " dia" + ( book.getRentDuration() > 1 ? "s" : "");
+
+            table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, rentDurationString, book.getISBN()});
         }
     }
 
@@ -313,15 +351,19 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
     }
 
     private void updateControls(){
-        this.doneButton.setVisible(this.isAdmin);
+        String changeStatusUserText = isJustUserBooks ? "Devolver" : "Alugar / Devolver";
+        this.doneButton.setText(this.isAdmin ? "Alterar status" : changeStatusUserText);
         this.editButton.setVisible(this.isAdmin);
         this.removeButton.setVisible(this.isAdmin);
         this.addButton.setVisible(this.isAdmin);
     }
 
     @Override
-    public void open(Boolean isAdmin) {
+    public void open(Boolean isAdmin, int userId, boolean isJustUserBooks) {
         this.isAdmin = isAdmin;
+        this.userId = userId;
+        this.isJustUserBooks = isJustUserBooks;
+        loadBooks("");
         updateControls();
         setVisible(true);
     }

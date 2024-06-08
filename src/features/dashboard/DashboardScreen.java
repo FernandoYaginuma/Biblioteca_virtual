@@ -8,6 +8,14 @@ import java.awt.*;
 
 public class DashboardScreen extends JFrame implements DashboardInterface {
 
+
+    private JButton manageUsersButton;
+    private JButton manageBooksButton;
+    private JButton userBooksButton;
+
+    private Boolean isAdmin = false;
+    private int userId;
+
     public DashboardScreen() {
         setLocationRelativeTo(null);
         setTitle("Dashboard");
@@ -20,14 +28,21 @@ public class DashboardScreen extends JFrame implements DashboardInterface {
     private void openBooks(){
         setVisible(false);
         SwingUtilities.invokeLater(() -> {
-            ServiceLocator.getInstance().getBookView().open(true);
+            ServiceLocator.getInstance().getBookView().open(this.isAdmin, this.userId, false);
+        });
+    }
+
+    private void openUserBooks(){
+        setVisible(false);
+        SwingUtilities.invokeLater(() -> {
+            ServiceLocator.getInstance().getBookView().open(this.isAdmin, this.userId, true);
         });
     }
 
     private void openUsers(){
         setVisible(false);
         SwingUtilities.invokeLater(() -> {
-            ServiceLocator.getInstance().getUserView().open();
+            ServiceLocator.getInstance().getUserView().open(this.userId);
         });
     }
 
@@ -43,6 +58,7 @@ public class DashboardScreen extends JFrame implements DashboardInterface {
 
 
         JButton manageBooksButton = new JButton("Gerenciar Livros");
+        JButton userBooksButton = new JButton("Meus livros");
         JButton manageUsersButton = new JButton("Gerenciar Usuários");
 
         manageBooksButton.addActionListener(e -> {
@@ -53,14 +69,28 @@ public class DashboardScreen extends JFrame implements DashboardInterface {
            this.openUsers();
         });
 
+        userBooksButton.addActionListener(e -> {
+            this.openUserBooks();
+        });
+
+        this.manageBooksButton = manageBooksButton;
+        this.manageUsersButton = manageUsersButton;
+        this.userBooksButton = userBooksButton;
+
         buttonPanel.add(manageBooksButton);
         buttonPanel.add(manageUsersButton);
+        buttonPanel.add(userBooksButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
     @Override
-    public void open(Boolean isAdmin) {
+    public void open(Boolean isAdmin, int userId) {
+        this.isAdmin = isAdmin;
+        this.userId = userId;
+        this.manageUsersButton.setVisible(isAdmin);
+        this.manageBooksButton.setText(isAdmin ? "Gerenciar Livros" : "Alugar livros");
+        this.userBooksButton.setVisible(!isAdmin);
         setVisible(true);
     }
 }

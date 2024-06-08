@@ -11,6 +11,8 @@ public interface BookControllerInterface {
     void updateBook(int bookId, BookDTO bookDTO);
 
     void removeBook(int bookId);
-    void setRented(int bookId, boolean rented);
+    void returnBook(int bookId);
+    void rent(int bookId, int userId, int duration);
     List<Book> getBooks(String searchTerm);
+    List<Book> getBooksFromUser(int userId, String searchTerm);
 }

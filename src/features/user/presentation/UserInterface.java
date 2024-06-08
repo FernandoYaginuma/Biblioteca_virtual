@@ -1,5 +1,5 @@
 package features.user.presentation;
 
 public interface UserInterface {
-    void open();
+    void open(int userId);
 }

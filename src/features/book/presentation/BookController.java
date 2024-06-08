@@ -67,14 +67,23 @@ public class BookController implements BookControllerInterface {
     }
 
     @Override
-    public void setRented(int bookId, boolean rented) {
+    public void returnBook(int bookId) {
+        bookDatabase.returnBook(bookId);
+    }
 
-        bookDatabase.updateBookRented(bookId, rented);
+    @Override
+    public void rent(int bookId, int userId, int duration) {
+        bookDatabase.rent(bookId, userId, duration);
     }
 
     @Override
     public List<Book> getBooks(String searchTerm) {
         return bookDatabase.getBooks(searchTerm);
+    }
+
+    @Override
+    public List<Book> getBooksFromUser(int userId, String searchTerm) {
+        return bookDatabase.getBooksFromUser(userId, searchTerm);
     }
 
     private void showErrorMessage(String msg) {

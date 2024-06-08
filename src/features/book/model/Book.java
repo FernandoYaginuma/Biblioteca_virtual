@@ -16,7 +16,8 @@ public class Book {
     private String author;
     private String category;
     private String ISBN;
-    private boolean rented = false;
+    private int rentedBy = -1;
+    private int rentDuration = 0;
 
     public Book() {}
 
@@ -58,17 +59,24 @@ public class Book {
     }
 
     public boolean isRented() {
-        return this.rented;
+        return this.rentedBy > 0;
     }
 
-    public void setRented(boolean rented) {
-        this.rented = rented;
+    public void setRentedBy(int userId) {
+        this.rentedBy = userId;
+    }
+
+    public void setRentDuration(int rentDuration) {
+        this.rentDuration = rentDuration;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public int getRentedBy() {
+        return rentedBy;
+    }
 
     public void setAuthor(String author) {
         this.author = author;
@@ -80,5 +88,9 @@ public class Book {
 
     public void setISBN(String ISBN){
         this.ISBN = ISBN;
+    }
+
+    public int getRentDuration() {
+        return rentDuration;
     }
 }

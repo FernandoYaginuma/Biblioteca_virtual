@@ -29,7 +29,7 @@ public class LoginController implements LoginControllerInterface {
             }
 
             loginScreen.setVisible(false);
-            SwingUtilities.invokeLater(() -> ServiceLocator.getInstance().getDashboardView().open(user.isAdmin()));
+            SwingUtilities.invokeLater(() -> ServiceLocator.getInstance().getDashboardView().open(user.isAdmin(), user.getId()));
             return true;
         } catch (Exception e) {
             e.printStackTrace();

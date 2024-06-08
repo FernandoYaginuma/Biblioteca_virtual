@@ -2,5 +2,5 @@ package features.dashboard;
 
 public interface DashboardInterface {
 
-    void open(Boolean isAdmin);
+    void open(Boolean isAdmin, int userId);
 }

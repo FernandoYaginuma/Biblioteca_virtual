@@ -98,17 +98,53 @@ public class BookDAO implements BookDatabase, BookSubscriber {
     }
 
     @Override
-    public void updateBookRented(int bookId, boolean rented) {
+    public List<Book> getBooksFromUser(int userId, String searchTerm) {
+        List<Book> result = new ArrayList<>();
+        try {
+            result = DatabaseManager.getDatabaseSessionFactory().fromTransaction(session -> {
+                // Build the search query dynamically
+                String query = "from Book b where b.rentedBy = :userId and (b.name like :searchTerm or b.author like :searchTerm)";
+                return session.createQuery(query, Book.class)
+                        .setParameter("userId", userId)
+                        .setParameter("searchTerm", "%" + searchTerm + "%")
+                        .getResultList();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    @Override
+    public void rent(int bookId, int userID, int duration) {
         try {
             DatabaseManager.getDatabaseSessionFactory().inTransaction(session -> {
                 var book = session.get(Book.class, bookId);
-                book.setRented(rented);
+                book.setRentedBy(userID);
+                book.setRentDuration(duration);
                 session.persist(book);
             });
             System.out.println("features.book.model.Book edited successfully.");
             notifyDataChanged();
         } catch (Exception e) {
-            System.out.println("Error editing book: " + e.getMessage());
+            System.out.println("Error renting book: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void returnBook(int bookId) {
+        try {
+            DatabaseManager.getDatabaseSessionFactory().inTransaction(session -> {
+                var book = session.get(Book.class, bookId);
+                book.setRentedBy(0);
+                book.setRentDuration(0);
+                session.persist(book);
+            });
+            System.out.println("features.book.model.Book edited successfully.");
+            notifyDataChanged();
+        } catch (Exception e) {
+            System.out.println("Error returning book: " + e.getMessage());
         }
     }
 }

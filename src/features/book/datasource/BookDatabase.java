@@ -11,5 +11,8 @@ public interface BookDatabase {
 
     void removeBook(int bookId);
     List<Book> getBooks(String searchTerm);
-    void updateBookRented(int bookId, boolean rented);
+    List<Book> getBooksFromUser(int userId, String searchTerm);
+
+    void rent(int bookId, int userId, int duration);
+    void returnBook(int bookId);
 }
