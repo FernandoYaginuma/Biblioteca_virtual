@@ -60,7 +60,7 @@ public class UserScreen extends JFrame implements ActionListener, UserInterface,
         buttonPanel.add(backButton);
 
         JTextField searchField = new JTextField();
-        Dimension size = new Dimension(300, 30);
+        Dimension size = new Dimension(320, 30);
         searchField.setPreferredSize(size);
         buttonPanel.add(searchField);
 

@@ -18,6 +18,11 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
     private DefaultTableModel table;
     private final BookControllerInterface bookControllerInterface;
 
+    private JButton doneButton;
+    private JButton editButton;
+    private JButton removeButton;
+    private JButton addButton;
+
     private Boolean isAdmin = false;
 
     public BooksScreen(BookSubscriber bookSubscriber, BookControllerInterface bookControllerInterface) {
@@ -33,7 +38,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         initializeUI();
 
         // Load books from the database and display them
-        loadBooks();
+        loadBooks("");
     }
 
     private void goBack(){
@@ -68,7 +73,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         buttonPanel.add(backButton);
 
         JTextField searchField = new JTextField();
-        Dimension size = new Dimension(280, 30); // Largura = 200, Altura = 30
+        Dimension size = new Dimension(isAdmin ? 680 : 280, 30); // Largura = 200, Altura = 30
         searchField.setPreferredSize(size);
         buttonPanel.add(searchField);
 
@@ -92,7 +97,6 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
                 JOptionPane.showMessageDialog(BooksScreen.this, "Status do livro alterado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             }
         });
-        buttonPanel.add(doneButton, BorderLayout.EAST);
 
         JButton editButton = new JButton("Editar livro");
         editButton.setEnabled(false);
@@ -109,7 +113,6 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
                 editBook(selectedRow);
             }
         });
-        buttonPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
 
         JButton removeButton = new JButton("Excluir livro");
         removeButton.setEnabled(false);
@@ -126,7 +129,6 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
                 removeBook(selectedRow);
             }
         });
-        buttonPanel.add(removeButton, BorderLayout.EAST); // Add to the rightmost edge
 
         JButton addButton = new JButton("Adicionar livro");
         addButton.addActionListener(new ActionListener() {
@@ -135,7 +137,26 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
                 addBook();
             }
         });
+
+        JButton searchButton = new JButton("Buscar");
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String searchterm = searchField.getText();
+                loadBooks(searchterm);
+            }
+        });
+
+        buttonPanel.add(searchButton, BorderLayout.EAST);
+        buttonPanel.add(doneButton, BorderLayout.EAST);
+        buttonPanel.add(editButton, BorderLayout.EAST); // Add to the rightmost edge
+        buttonPanel.add(removeButton, BorderLayout.EAST); // Add to the rightmost edge
         buttonPanel.add(addButton, BorderLayout.EAST);
+
+        this.doneButton = doneButton;
+        this.editButton = editButton;
+        this.removeButton = removeButton;
+        this.addButton = addButton;
 
         add(buttonPanel, BorderLayout.NORTH);
 
@@ -146,12 +167,12 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         });
     }
 
-    private void loadBooks() {
+    private void loadBooks(String searchTerm) {
         // Clear existing rows from the table
         table.setRowCount(0);
 
         // Populate the table with books from the database
-        List<Book> books = bookControllerInterface.getBooks();
+        List<Book> books = bookControllerInterface.getBooks(searchTerm);
         for (Book book : books) {
             String rentedString = book.isRented() ? "Alugado" : "Disponível";
             table.addRow(new Object[]{book.getId(), book.getName(), book.getAuthor(), book.getCategory(), rentedString, book.getISBN()});
@@ -291,9 +312,17 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         }
     }
 
+    private void updateControls(){
+        this.doneButton.setVisible(this.isAdmin);
+        this.editButton.setVisible(this.isAdmin);
+        this.removeButton.setVisible(this.isAdmin);
+        this.addButton.setVisible(this.isAdmin);
+    }
+
     @Override
     public void open(Boolean isAdmin) {
         this.isAdmin = isAdmin;
+        updateControls();
         setVisible(true);
     }
 
@@ -304,6 +333,6 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
 
     @Override
     public void updateData() {
-        loadBooks();
+        loadBooks("");
     }
 }

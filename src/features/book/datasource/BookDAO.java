@@ -80,11 +80,14 @@ public class BookDAO implements BookDatabase, BookSubscriber {
     }
 
     @Override
-    public List<Book> getBooks() {
+    public List<Book> getBooks(String searchTerm) {
         List<Book> result = new ArrayList<>();
         try {
             result = DatabaseManager.getDatabaseSessionFactory().fromTransaction(session -> {
-                return session.createSelectionQuery("from Book", Book.class)
+                // Build the search query dynamically
+                String query = "from Book b where b.name like :searchTerm or b.author like :searchTerm";
+                return session.createQuery(query, Book.class)
+                        .setParameter("searchTerm", "%" + searchTerm + "%")
                         .getResultList();
             });
         } catch (Exception e) {

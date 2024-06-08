@@ -10,6 +10,6 @@ public interface BookDatabase {
     void updateBook(int bookId, BookDTO bookDTO);
 
     void removeBook(int bookId);
-    List<Book> getBooks();
+    List<Book> getBooks(String searchTerm);
     void updateBookRented(int bookId, boolean rented);
 }

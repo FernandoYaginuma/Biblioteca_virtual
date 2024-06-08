@@ -12,5 +12,5 @@ public interface BookControllerInterface {
 
     void removeBook(int bookId);
     void setRented(int bookId, boolean rented);
-    List<Book> getBooks();
+    List<Book> getBooks(String searchTerm);
 }

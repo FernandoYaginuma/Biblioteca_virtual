@@ -73,8 +73,8 @@ public class BookController implements BookControllerInterface {
     }
 
     @Override
-    public List<Book> getBooks() {
-        return bookDatabase.getBooks();
+    public List<Book> getBooks(String searchTerm) {
+        return bookDatabase.getBooks(searchTerm);
     }
 
     private void showErrorMessage(String msg) {
