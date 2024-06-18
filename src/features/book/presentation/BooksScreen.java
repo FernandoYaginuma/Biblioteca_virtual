@@ -306,7 +306,7 @@ public class BooksScreen extends JFrame implements BooksInterface, BookListener 
         String currentName = (String) table.getValueAt(rowIndex, 1);
         String currentAuthor = (String) table.getValueAt(rowIndex, 2);
         String currentCategory = (String) table.getValueAt(rowIndex, 3);
-        String currentISBN = (String) table.getValueAt(rowIndex, 5);
+        String currentISBN = (String) table.getValueAt(rowIndex, 6);
 
         // Criando painel para os campos
         JPanel panel = new JPanel();

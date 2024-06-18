@@ -51,7 +51,18 @@ public class DashboardScreen extends JFrame implements DashboardInterface {
         // Painel superior com botão Voltar
         JLabel welcomeLabel = new JLabel("Bem-vindo ao sistema da Biblioteca Virtual :)");
 
-        add(welcomeLabel, BorderLayout.NORTH);
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BorderLayout());
+
+
+        JButton exitButton = new JButton("Sair");
+        exitButton.addActionListener(e -> {
+            this.logout();
+        });
+
+        headerPanel.add(welcomeLabel, BorderLayout.WEST);
+        headerPanel.add(exitButton, BorderLayout.EAST);
+        add(headerPanel, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0)); // Set leading alignment and no gaps
@@ -92,5 +103,12 @@ public class DashboardScreen extends JFrame implements DashboardInterface {
         this.manageBooksButton.setText(isAdmin ? "Gerenciar Livros" : "Alugar livros");
         this.userBooksButton.setVisible(!isAdmin);
         setVisible(true);
+    }
+
+    private void logout(){
+        setVisible(false);
+        SwingUtilities.invokeLater(() -> {
+            ServiceLocator.getInstance().getLoginView().open();
+        });
     }
 }
